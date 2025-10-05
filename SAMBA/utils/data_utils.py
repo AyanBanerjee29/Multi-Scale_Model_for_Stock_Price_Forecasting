@@ -63,14 +63,27 @@ def prepare_data(csv_file, window=5, predict=1, test_ratio=0.15, val_ratio=0.05)
     Returns:
         train_loader, val_loader, test_loader, mmn (normalizer)
     """
-    # Load data
-    X = pd.read_csv(csv_file, index_col="Date", parse_dates=True)
+    # Load data, using first column as index and parsing dates
+    X = pd.read_csv(csv_file, index_col=0, parse_dates=True)
+    X.index.name = "Date"
     
+    # Standardize column names to lowercase
+    X.columns = [col.lower() for col in X.columns]
+    
+    # Ensure 'price' column exists, renaming from 'close' if necessary
+    if 'price' not in X.columns and 'close' in X.columns:
+        X.rename(columns={'close': 'price'}, inplace=True)
+
+    # Check if 'price' column is now available, otherwise raise a clear error
+    if 'price' not in X.columns:
+        raise KeyError(f"Fatal Error: Could not find 'price' or 'close' column in the dataset. Available columns are: {list(X.columns)}")
+
     # Basic preprocessing
-    name = X["Name"][0]
-    del X["Name"]
+    name = X["name"][0]
+    del X["name"]
     cols = X.columns
-    X["Target"] = (X["Price"].pct_change().shift(-1) > 0).astype(int)
+    # Use lowercase 'price' to create the 'target'
+    X["target"] = (X["price"].pct_change().shift(-1) > 0).astype(int)
     X.dropna(inplace=True)
     
     # Convert to numpy
@@ -87,7 +100,8 @@ def prepare_data(csv_file, window=5, predict=1, test_ratio=0.15, val_ratio=0.05)
     X_seq = []
     Y_seq = []
     
-    price_index = list(X.columns).index('Price')
+    # Get index of lowercase 'price'
+    price_index = list(X.columns).index('price')
 
     while i + window < ran:
         X_seq.append(torch.Tensor(dataset[i:i+window, :]))

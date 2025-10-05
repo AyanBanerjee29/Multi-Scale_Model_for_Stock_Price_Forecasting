@@ -21,11 +21,19 @@ def download_yfinance_data(ticker, start_date, end_date, output_folder="Dataset"
     # Download the data
     data = yf.download(ticker, start=start_date, end=end_date)
 
-    # Rename 'Close' to 'Price'
-    data.rename(columns={"Close": "Price"}, inplace=True)
+    # If yfinance returns multi-index columns, flatten them
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = data.columns.get_level_values(0)
 
-    # Add the 'Name' column
-    data["Name"] = ticker
+    # Standardize all column names to lowercase
+    data.columns = [str(col).lower() for col in data.columns]
+
+    # Rename 'close' to 'price' for consistency
+    if 'close' in data.columns:
+        data.rename(columns={"close": "price"}, inplace=True)
+
+    # Add the 'name' column
+    data["name"] = ticker
 
     # Define the output path
     output_path = os.path.join(output_folder, f"{ticker}.csv")
