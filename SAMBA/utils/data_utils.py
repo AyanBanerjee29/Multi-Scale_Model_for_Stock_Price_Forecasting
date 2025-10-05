@@ -18,8 +18,8 @@ class MinMaxNorm01:
         pass
     
     def fit(self, x):
-        self.min = x.min()
-        self.max = x.max()
+        self.min = x.min(axis=0)
+        self.max = x.max(axis=0)
     
     def transform(self, x):
         x = 1.0 * (x - self.min) / (self.max - self.min)
@@ -30,7 +30,7 @@ class MinMaxNorm01:
         return self.transform(x)
     
     def inverse_transform(self, x):
-        x = x * (self.max - self.min) + self.min
+        x = x * (self.max[0] - self.min[0]) + self.min[0]
         return x
 
 
@@ -87,9 +87,11 @@ def prepare_data(csv_file, window=5, predict=1, test_ratio=0.15, val_ratio=0.05)
     X_seq = []
     Y_seq = []
     
+    price_index = list(X.columns).index('Price')
+
     while i + window < ran:
-        X_seq.append(torch.Tensor(dataset[i:i+window, 1:]))
-        Y_seq.append(torch.Tensor(dataset[i+window:i+window+predict, 0]))
+        X_seq.append(torch.Tensor(dataset[i:i+window, :]))
+        Y_seq.append(torch.Tensor(dataset[i+window:i+window+predict, price_index]))
         i += 1
     
     XX = torch.stack(X_seq, dim=0)
