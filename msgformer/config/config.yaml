@@ -1,0 +1,39 @@
+# Data Configuration
+data:
+  tickers: ['000300.SS', '000016.SS', '000905.SS', '000001.SS']  # CSI 300, SSE 50, CSI 500, SSE Composite
+  start_date: '2019-01-01'
+  end_date: '2024-12-31'
+  interval: '1m'  # 1 minute data
+  train_ratio: 0.7
+  val_ratio: 0.2
+  test_ratio: 0.1
+
+# Model Configuration
+model:
+  input_dim: 5  # open, high, low, close, volume
+  d_model: 128
+  n_heads: 8
+  n_encoder_layers: 3
+  n_decoder_layers: 3
+  dropout: 0.1
+  k_scales: 5  # number of scales for MSGNet
+
+# MSGNet Configuration
+msgnet:
+  hidden_dim: 128
+  n_blocks: 2
+  adj_powers: [1, 2, 3]  # powers for adjacency matrix in graph convolution
+
+# Training Configuration
+training:
+  batch_size: 64
+  epochs: 100
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  patience: 10
+  seq_len: 60  # input sequence length (60 minutes)
+  pred_len: 1   # prediction length (1 step ahead)
+
+# Device Configuration
+device: 'cuda'  # 'cuda' or 'cpu'
+
