@@ -1,6 +1,6 @@
 # Data Configuration
 data:
-  tickers: ['000300.SS', '000016.SS', '000905.SS', '000001.SS']  # CSI 300, SSE 50, CSI 500, SSE Composite
+  tickers: ['^NSEI', '^BSESN', '^CNX500', '^NSMIDCP']  # CSI 300, SSE 50, CSI 500, SSE Composite
   start_date: '2019-01-01'
   end_date: '2024-12-31'
   interval: '1m'  # 1 minute data
